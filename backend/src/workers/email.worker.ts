@@ -37,7 +37,7 @@ class EmailWorker {
                 return await this.processJob(job);
             },
             {
-                connection: redis,
+                connection: redis as any,
                 concurrency: config.queue.workerConcurrency,
                 limiter: {
                     max: 1,

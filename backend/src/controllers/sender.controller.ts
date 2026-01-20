@@ -51,7 +51,7 @@ export class SenderController {
      * GET /api/senders
      * List all senders
      */
-    async listSenders(req: Request, res: Response) {
+    async listSenders(_req: Request, res: Response) {
         try {
             const senders = await senderService.listSenders();
 
@@ -72,7 +72,7 @@ export class SenderController {
      * Get sender by ID
      */
     async getSender(req: Request, res: Response) {
-        const { id } = req.params;
+        const { id } = req.params as { id: string };
 
         try {
             const sender = await senderService.getSenderById(id);
@@ -100,7 +100,7 @@ export class SenderController {
      * Update sender
      */
     async updateSender(req: Request, res: Response) {
-        const { id } = req.params;
+        const { id } = req.params as { id: string };
         const validation = updateSenderSchema.safeParse(req.body);
 
         if (!validation.success) {
@@ -130,7 +130,7 @@ export class SenderController {
      * Delete sender
      */
     async deleteSender(req: Request, res: Response) {
-        const { id } = req.params;
+        const { id } = req.params as { id: string };
 
         try {
             await senderService.deleteSender(id);

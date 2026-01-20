@@ -93,7 +93,7 @@ export class EmailController {
      * Get email by ID
      */
     async getEmail(req: Request, res: Response) {
-        const { id } = req.params;
+        const { id } = req.params as { id: string };
 
         try {
             const email = await emailService.getEmailById(id);
@@ -121,7 +121,7 @@ export class EmailController {
      * Cancel a scheduled email
      */
     async cancelEmail(req: Request, res: Response) {
-        const { id } = req.params;
+        const { id } = req.params as { id: string };
 
         try {
             const email = await emailService.cancelEmail(id);

@@ -18,13 +18,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Request logging
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
     logger.info(`${req.method} ${req.path}`);
     next();
 });
 
 // Health check
-app.get('/health', async (req, res) => {
+app.get('/health', async (_req, res) => {
     try {
         // Check database
         await prisma.$queryRaw`SELECT 1`;
@@ -50,7 +50,7 @@ app.use('/api/emails', emailRoutes);
 app.use('/api/senders', senderRoutes);
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
     res.status(404).json({
         error: 'Not found',
     });

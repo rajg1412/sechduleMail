@@ -1,9 +1,8 @@
 import { Queue, QueueOptions } from 'bullmq';
-import { config } from './index';
 import redis from './redis';
 
 const queueOptions: QueueOptions = {
-    connection: redis,
+    connection: redis as any,
     defaultJobOptions: {
         attempts: 3,
         backoff: {
