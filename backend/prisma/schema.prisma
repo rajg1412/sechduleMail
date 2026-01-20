@@ -1,0 +1,82 @@
+// Prisma schema for Email Scheduler
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Sender {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  smtpUser  String
+  smtpPass  String
+  rateLimit Int      @default(100) // Max emails per hour for this sender
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  emails Email[]
+
+  @@index([email])
+}
+
+model Email {
+  id          String   @id @default(uuid())
+  senderId    String
+  sender      Sender   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  
+  recipientEmail String
+  recipientName  String?
+  subject        String
+  body           String   @db.Text
+  
+  scheduledAt DateTime
+  sentAt      DateTime?
+  
+  status      EmailStatus @default(PENDING)
+  
+  // BullMQ job tracking
+  jobId       String?  @unique
+  
+  // Idempotency
+  idempotencyKey String @unique
+  
+  // Metadata
+  errorMessage String?  @db.Text
+  attempts     Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([jobId])
+}
+
+model RateLimit {
+  id           String   @id @default(uuid())
+  senderId     String
+  hourWindow   DateTime // Start of the hour window
+  emailCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([senderId, hourWindow])
+  @@index([senderId, hourWindow])
+}
+
+enum EmailStatus {
+  PENDING
+  SCHEDULED
+  PROCESSING
+  SENT
+  FAILED
+  CANCELLED
+  RATE_LIMITED
+}
